@@ -23,16 +23,16 @@ class Particle {
     this.speedY;
     this.speedMod = Math.random() * 8 + 1;
     this.history = [{ x: this.x, y: this.y }];
-    this.maxLength = 210 - Math.random() * 200;
+    this.maxLength = 50 - Math.random() * 40;
     this.angle = 0;
     this.lineWidth = Math.floor(Math.random() * 3 + 1);
     this.alpha = Math.random();
-    this.colors = ["#005067", "#048399", "#FEB9C6", "#B96B85"];
+    this.colors = ["#FFB84C", "#F266AB", "#A459D1", "#2CD3E1"];
     this.color = addAlpha(
       this.colors[Math.floor(Math.random() * this.colors.length)],
       this.alpha
     );
-    this.timer = this.maxLength * 3;
+    this.timer = this.maxLength * 2;
   }
   draw(context) {
     //context.fillRect(this.x, this.y, 20, 20);
@@ -44,6 +44,8 @@ class Particle {
       context.lineTo(this.history[i].x, this.history[i].y);
     }
     context.strokeStyle = this.color;
+    // context.shadowBlur = 12;
+    // context.shadowColor = this.color;
     context.stroke();
   }
   update() {
@@ -64,16 +66,19 @@ class Particle {
       if (this.history.length > this.maxLength) {
         this.history.shift();
       }
+    } else if (this.history.length > 1) {
+      this.history.shift();
     } else {
       this.reset();
     }
+    //this.effect.flowFieldUpdate();
   }
 
   reset() {
     this.x = Math.floor(Math.random() * this.effect.width);
     this.y = Math.floor(Math.random() * this.effect.height);
     this.history = [{ x: this.x, y: this.y }];
-    this.timer = this.maxLength * 3;
+    this.timer = this.maxLength * 2;
   }
 }
 
@@ -84,13 +89,14 @@ class Effect {
     this.width = this.canvas.width;
     this.particles = [];
     this.nOfParticles = 500;
-    this.cellSize = 2;
+    this.cellSize = 5;
     this.rows;
     this.cols;
     this.flowField = [];
     this.curve = 2.1;
-    this.zoom = 0.02;
+    this.zoom = 0.01;
     this.debug = false;
+    this.ffu = 1;
 
     this.init();
 
@@ -118,7 +124,8 @@ class Effect {
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
         const angle =
-          (Math.sin(x * this.zoom) + Math.cos(y * this.zoom)) * this.curve;
+          1.01 * Math.sin(this.ffu) * Math.cos(y * this.zoom) * this.curve -
+          1.01 * Math.cos(this.ffu) * Math.sin(x * this.zoom);
         this.flowField.push(angle);
       }
     }
@@ -126,6 +133,19 @@ class Effect {
     for (let i = 0; i < this.nOfParticles; i++) {
       this.particles.push(new Particle(this));
     }
+  }
+
+  flowFieldUpdate() {
+    this.flowField = [];
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        const angle =
+          1.01 * Math.cos(this.ffu) * Math.cos(y * this.zoom) * this.curve -
+          1.01 * Math.cos(this.ffu) * Math.sin(x * this.zoom);
+        this.flowField.push(angle);
+      }
+    }
+    this.ffu += 0.005;
   }
 
   drawGrid(context) {
@@ -165,6 +185,7 @@ function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     effect.render(ctx);
+    effect.flowFieldUpdate();
   }, 1000 / fps);
 }
 animate();
