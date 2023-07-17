@@ -25,7 +25,7 @@ class Particle {
     this.history = [{ x: this.x, y: this.y }];
     this.maxLength = 50 - Math.random() * 40;
     this.angle = 0;
-    this.lineWidth = Math.floor(Math.random() * 3 + 1);
+    this.lineWidth = Math.floor(Math.random() * 4 + 1);
     this.alpha = Math.random();
     this.colors = ["#FFB84C", "#F266AB", "#A459D1", "#2CD3E1"];
     this.color = addAlpha(
@@ -94,9 +94,9 @@ class Effect {
     this.cols;
     this.flowField = [];
     this.curve = 2.1;
-    this.zoom = 0.01;
+    this.zoom = 0.02;
     this.debug = false;
-    this.ffu = 1;
+    this.ffu = 0;
 
     this.init();
 
@@ -124,8 +124,9 @@ class Effect {
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
         const angle =
-          1.01 * Math.cos(this.ffu) * Math.cos(y * this.zoom) * this.curve -
-          1.01 * Math.cos(this.ffu) * Math.sin(x * this.zoom);
+          (Math.sin(this.ffu) * Math.cos(x * this.zoom) +
+            Math.sin(y * this.zoom)) *
+          this.curve;
         this.flowField.push(angle);
       }
     }
@@ -140,12 +141,15 @@ class Effect {
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
         const angle =
-          1.01 * Math.cos(this.ffu) * Math.cos(y * this.zoom) * this.curve -
-          1.01 * Math.cos(this.ffu) * Math.sin(x * this.zoom);
+          (Math.sin(this.ffu) * Math.cos(x * this.zoom) +
+            Math.sin(y * this.zoom)) *
+          this.curve;
+        //   1.01 * Math.cos(this.ffu) * Math.cos(y * this.zoom) * this.curve -
+        //   1.01 * Math.cos(this.ffu) * Math.sin(x * this.zoom);
         this.flowField.push(angle);
       }
     }
-    this.ffu += 0.005;
+    this.ffu += 0.01;
   }
 
   drawGrid(context) {
