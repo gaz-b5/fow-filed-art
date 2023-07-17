@@ -94,7 +94,7 @@ class Effect {
     this.cols;
     this.flowField = [];
     this.curve = 2.1;
-    this.zoom = 0.02;
+    this.zoom = 0.01;
     this.debug = false;
     this.ffu = 0;
 
@@ -124,9 +124,7 @@ class Effect {
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
         const angle =
-          (Math.sin(this.ffu) * Math.cos(x * this.zoom) +
-            Math.sin(y * this.zoom)) *
-          this.curve;
+          (Math.cos(x * this.zoom) + Math.sin(y * this.zoom)) * this.curve;
         this.flowField.push(angle);
       }
     }
@@ -141,8 +139,8 @@ class Effect {
     for (let y = 0; y < this.rows; y++) {
       for (let x = 0; x < this.cols; x++) {
         const angle =
-          (Math.sin(this.ffu) * Math.cos(x * this.zoom) +
-            Math.sin(y * this.zoom)) *
+          (Math.cos(x * this.zoom) * Math.cos(x * this.zoom) +
+            Math.sin(y * this.zoom) * Math.sin(y * this.zoom)) *
           this.curve;
         //   1.01 * Math.cos(this.ffu) * Math.cos(y * this.zoom) * this.curve -
         //   1.01 * Math.cos(this.ffu) * Math.sin(x * this.zoom);
